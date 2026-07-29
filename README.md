@@ -4,7 +4,7 @@ Chrome / Edge Manifest V3 本地扩展。它优先导出 Bilibili 已有字幕�
 
 当前版本：`1.3.0`
 
-
+扩展侧栏采用与 Pond 星空图标和 `WHISPER LIVE` 一致的深空蓝、星云紫与冰青仪表风格，操作卡、选择器、确认区、运行进度和失败清单使用统一的视觉层级。
 
 > **使用声明：** 本项目仅限个人学习及处理本人有权访问的公开视频。请遵守 [Bilibili 用户使用协议](https://www.bilibili.com/blackboard/user-rule-linux.html?night=1&padding=0) 和相关版权规定，不得用于未经授权的批量抓取、传播或商业用途。本项目不绕过登录、付费或其他访问控制。
 
@@ -124,15 +124,6 @@ powershell -ExecutionPolicy Bypass -File .\uninstall-helper.ps1
 - **CPU 转写较慢**：这是免费的本机计算；可保持助手后台运行，之后回到同一个 BV 页面恢复。
 - **显示需要登录或无权访问**：先在网页确认自己有权观看并刷新。此类失败不会自动进入 Whisper 队列。
 - **日志位置**：`%LOCALAPPDATA%\BiliSubtitleWhisper\logs\helper.log`。
-
-## 本地测试
-
-```powershell
-node .\test-core.js
-python .\helper\test_helper.py
-```
-
-测试覆盖 164 分P顺序和去重、合集展开、字幕优先级、时间链接、Markdown 转义、模型选择与校验、本机队列、分模型缓存、取消、异常、重启恢复、非法 BV/CID、随机令牌握手与临时音频清理。
 
 ## 使用边界
 
