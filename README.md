@@ -4,7 +4,7 @@ Chrome / Edge Manifest V3 本地扩展。它优先导出 Bilibili 已有字幕�
 
 当前版本：`1.3.0`
 
-扩展侧栏采用与 Pond 星空图标和 `WHISPER LIVE` 一致的深空蓝、星云紫与冰青仪表风格，操作卡、选择器、确认区、运行进度和失败清单使用统一的视觉层级。
+
 
 > **使用声明：** 本项目仅限个人学习及处理本人有权访问的公开视频。请遵守 [Bilibili 用户使用协议](https://www.bilibili.com/blackboard/user-rule-linux.html?night=1&padding=0) 和相关版权规定，不得用于未经授权的批量抓取、传播或商业用途。本项目不绕过登录、付费或其他访问控制。
 
