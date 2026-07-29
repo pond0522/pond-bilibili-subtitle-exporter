@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Bilibili 系列字幕导出",
+  "version": "1.3.0",
+  "author": "Pond",
+  "description": "优先导出 Bilibili 字幕，并用免费的本机 Whisper 补齐无字幕分P。",
+  "minimum_chrome_version": "102",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://api.bilibili.com/*",
+    "https://*.hdslb.com/*",
+    "http://127.0.0.1:17891/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.bilibili.com/video/*"],
+      "js": ["core.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

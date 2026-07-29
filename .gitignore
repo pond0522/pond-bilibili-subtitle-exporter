@@ -1,0 +1,36 @@
+# Personal editor and workspace state
+.git/
+.obsidian/
+.claudian/
+.vscode/
+.idea/
+
+# Python caches and environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local helper data
+/helper-token.js
+*.log
+*.token
+*.secret
+models/
+audio/
+cache/
+tasks/
+results/
+
+# Exported subtitles and release artifacts
+*-完整字幕*.md
+*.srt
+*.vtt
+*.ass
+*.mp3
+*.m4a
+*.wav
+*.webm
+*.part
+*.zip
+release/
