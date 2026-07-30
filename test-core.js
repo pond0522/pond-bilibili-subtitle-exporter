@@ -13,8 +13,9 @@ const requirements = fs.readFileSync(path.join(__dirname, "helper", "requirement
 const installerSource = fs.readFileSync(path.join(__dirname, "install-helper.ps1"), "utf8");
 const uninstallerSource = fs.readFileSync(path.join(__dirname, "uninstall-helper.ps1"), "utf8");
 const gitignoreSource = fs.readFileSync(path.join(__dirname, ".gitignore"), "utf8");
+const readmeSource = fs.readFileSync(path.join(__dirname, "README.md"), "utf8");
 assert.equal(manifest.manifest_version, 3);
-assert.equal(manifest.version, "1.3.0");
+assert.equal(manifest.version, "1.3.1");
 assert.equal(manifest.author, "Pond");
 assert.deepEqual(manifest.icons, {
   16: "icons/icon-16.png",
@@ -89,12 +90,15 @@ assert.doesNotMatch(contentSource, /AI 纠错|ai-enable|ai-endpoint/);
 assert.match(helperSource, /HOST = "127\.0\.0\.1"/);
 assert.match(helperSource, /language="zh"/);
 assert.match(helperSource, /vad_filter=vad_available/);
-assert.match(helperSource, /APP_VERSION = "1\.3\.0"/);
-assert.match(helperSource, /server_version = "BiliWhisper\/1\.3"/);
+assert.match(helperSource, /APP_VERSION = "1\.3\.1"/);
+assert.match(helperSource, /server_version = "BiliWhisper\/1\.3\.1"/);
 assert.match(helperSource, /SUPPORTED_MODELS = \("tiny", "base", "small"\)/);
 assert.match(helperSource, /HF_HUB_DISABLE_XET", "1"/);
 assert.match(helperSource, /MODEL_FILES = \("config\.json", "model\.bin", "tokenizer\.json", "vocabulary\.txt"\)/);
 assert.match(helperSource, /MODEL_BIN_BYTES = \{/);
+assert.match(helperSource, /action="append"/);
+assert.match(helperSource, /nargs="\?"/);
+assert.match(helperSource, /dict\.fromkeys\(arguments\.prepare_model\)/);
 assert.match(helperSource, /modelscope\.cn\/models\/Systran\/faster-whisper-/);
 assert.match(helperSource, /--retry-all-errors/);
 assert.match(helperSource, /--speed-time/);
@@ -107,6 +111,17 @@ assert.doesNotMatch(helperSource, /extensionOrigin|pairUntil|X-Bili-Extension-Or
 assert.doesNotMatch(helperSource, /cookies_from_browser|cookiefile|api\.openai\.com|api\.deepseek\.com/);
 assert.match(installerSource, /helper-token\.js/);
 assert.match(installerSource, /BILI_WHISPER_TOKEN/);
+assert.match(installerSource, /\[string\[\]\]\$Models = @\("tiny", "base", "small"\)/);
+assert.match(installerSource, /Minor -ge 10 -and \$details\.Minor -le 12/);
+assert.match(installerSource, /Bits -ne "64bit"/);
+assert.match(installerSource, /import compileall, ensurepip/);
+assert.match(installerSource, /\[IO\.DriveInfo\]::new/);
+assert.match(installerSource, /--prepare-model", \$modelName/);
+assert.ok(
+  installerSource.indexOf("$pythonDetails = Resolve-CompatiblePython") <
+    installerSource.indexOf("if (Test-Path -LiteralPath $configPath)"),
+  "Python must be validated before the running helper is stopped"
+);
 assert.match(uninstallerSource, /helper-token\.js/);
 assert.match(gitignoreSource, /\/helper-token\.js/);
 assert.match(requirements, /faster-whisper==1\.2\.1/);
@@ -114,6 +129,10 @@ assert.match(requirements, /ctranslate2==4\.6\.0/);
 assert.match(requirements, /numpy==1\.26\.4/);
 assert.match(requirements, /setuptools==80\.9\.0/);
 assert.match(requirements, /yt-dlp==2026\.7\.4/);
+assert.match(readmeSource, /当前版本：`1\.3\.1`/);
+assert.match(readmeSource, /64 位 Python 3\.10–3\.12/);
+assert.match(readmeSource, /-Models tiny,base/);
+assert.match(readmeSource, /-SkipModelDownload/);
 
 const pages = Array.from({ length: 164 }, (_, index) => ({
   cid: 1594645068 + index,

@@ -23,6 +23,7 @@ from whisper_helper import (
     atomic_json,
     cache_name,
     has_onnxruntime,
+    main,
     token_matches,
     validate_bvid,
     validate_model,
@@ -141,6 +142,39 @@ class HelperTests(unittest.TestCase):
             self.assertEqual(validate_model(model_name), model_name)
         with self.assertRaises(ValidationError):
             validate_model("large")
+
+    def test_prepare_model_cli_default_single_repeat_deduplicate_and_invalid(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config = Path(directory) / "config.json"
+            config.write_text(json.dumps({"token": "d" * 64, "port": 17891}), encoding="utf-8")
+            with mock.patch("whisper_helper.configure_logging"), mock.patch.object(
+                LocalTranscriber, "load_model"
+            ) as load_model:
+                self.assertEqual(main(["--config", str(config), "--prepare-model"]), 0)
+                load_model.assert_called_once_with(DEFAULT_MODEL)
+
+                load_model.reset_mock()
+                self.assertEqual(main(["--config", str(config), "--prepare-model", "tiny"]), 0)
+                load_model.assert_called_once_with("tiny")
+
+                load_model.reset_mock()
+                self.assertEqual(
+                    main([
+                        "--config", str(config),
+                        "--prepare-model", "tiny",
+                        "--prepare-model", "base",
+                        "--prepare-model", "tiny",
+                        "--prepare-model", "small",
+                    ]),
+                    0,
+                )
+                self.assertEqual(
+                    load_model.call_args_list,
+                    [mock.call("tiny"), mock.call("base"), mock.call("small")],
+                )
+
+                with self.assertRaises(SystemExit):
+                    main(["--config", str(config), "--prepare-model", "large"])
 
     def test_queue_cache_and_temp_cleanup(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -2,7 +2,7 @@
 
 Chrome / Edge Manifest V3 本地扩展。它优先导出 Bilibili 已有字幕；遇到无字幕、字幕为空或明显错配的普通公开视频时，可使用免费的本机 Whisper `tiny`、`base` 或 `small` 补齐。
 
-当前版本：`1.3.0`
+当前版本：`1.3.1`
 
 扩展侧栏采用与 Pond 星空图标和 `WHISPER LIVE` 一致的深空蓝、星云紫与冰青仪表风格，操作卡、选择器、确认区、运行进度和失败清单使用统一的视觉层级。
 
@@ -38,7 +38,7 @@ Edge：
 
 ### 路径二：Whisper补齐，需要安装助手
 
-先按“路径一”加载扩展。然后准备 Windows 10/11、64 位 Python 3.10 或更高版本、至少 5GB 可用磁盘空间，以及首次下载依赖和默认 Whisper `small` 模型的网络连接。
+先按“路径一”加载扩展。然后准备 Windows 10/11、**64 位 Python 3.10–3.12**、至少 5GB 可用磁盘空间，以及首次下载依赖和三个 Whisper 模型的网络连接。当前锁定依赖不支持 Python 3.13/3.14。
 
 在解压后的文件夹空白处按住 Shift 单击鼠标右键，打开 PowerShell，然后运行：
 
@@ -46,16 +46,35 @@ Edge：
 powershell -ExecutionPolicy Bypass -File .\install-helper.ps1
 ```
 
+默认会预下载 `tiny`、`base`、`small` 三个模型。也可以按需选择：
+
+```powershell
+# 只预装 small
+powershell -ExecutionPolicy Bypass -File .\install-helper.ps1 -Models small
+
+# 预装 tiny 和 base
+powershell -ExecutionPolicy Bypass -File .\install-helper.ps1 -Models tiny,base
+
+# 暂不下载模型，首次转写时再下载所选模型
+powershell -ExecutionPolicy Bypass -File .\install-helper.ps1 -SkipModelDownload
+```
+
+电脑中安装了多个 Python 时，请传入**实际 `python.exe` 文件**，不要只填写它的上级目录：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install-helper.ps1 -PythonExe "D:\Python312\python.exe"
+```
+
 脚本会自动：
 
 1. 在 `%LOCALAPPDATA%\BiliSubtitleWhisper` 创建独立 Python 环境；
 2. 安装固定版本的 `faster-whisper 1.2.1` 和 `yt-dlp 2026.7.4`；
-3. 免费下载默认 Whisper `small` 模型；`tiny` 和 `base` 会在首次选择时自动下载；
+3. 默认免费下载并实际加载验证 Whisper `tiny`、`base`、`small` 三个模型；
 4. 生成随机安装令牌，并分别写入本机助手配置和当前扩展目录中被 Git 忽略的 `helper-token.js`；
 5. 注册当前 Windows 用户登录后静默启动；
 6. 启动并检查本机助手。
 
-安装完成后，请回到扩展管理页点击“重新加载”。扩展会从当前目录读取本机生成的随机令牌，不需要手工复制。助手只验证令牌，不依赖 Chrome/Edge 扩展 ID；同一目录移位或作为临时副本加载时不会因为扩展 ID 改变而失效。依赖默认从 PyPI 获取；连接异常时安装脚本会自动使用阿里云 PyPI 公共镜像重试，该镜像不参与字幕转写。
+安装器会先验证 Python 版本、64 位架构及完整标准库，再停止旧助手或写入运行目录；错误的 Python 不会中断已有助手。安装完成后，请回到扩展管理页点击“重新加载”。扩展会从当前目录读取本机生成的随机令牌，不需要手工复制。助手只验证令牌，不依赖 Chrome/Edge 扩展 ID；同一目录移位或作为临时副本加载时不会因为扩展 ID 改变而失效。依赖默认从 PyPI 获取；连接异常时安装脚本会自动使用阿里云 PyPI 公共镜像重试，该镜像不参与字幕转写。
 
 ## 隐私与安全
 
@@ -114,7 +133,8 @@ powershell -ExecutionPolicy Bypass -File .\uninstall-helper.ps1
 ## 故障排查
 
 - **提示助手未安装、令牌缺失或无法连接**：在当前扩展目录重新运行 `install-helper.ps1`，然后重新加载扩展。
-- **模型下载失败**：安装时只预下载默认 `small`；首次选择 `tiny` 或 `base` 会从 ModelScope 的 Systran 官方镜像自动下载，并支持断点续传。失败时检查网络和磁盘空间后重试，完整文件会复用，`model.bin` 大小不符时不会加载。
+- **Python 版本不兼容**：本版本支持 64 位 Python 3.10–3.12。Python 3.13/3.14 不适用于当前锁定依赖；多版本共存时用 `-PythonExe` 指向兼容版本中实际存在的 `python.exe`。
+- **模型下载失败**：默认预下载三个模型；也可用 `-Models` 只选择所需模型。模型从 ModelScope 的 Systran 官方镜像下载并支持断点续传。失败时检查网络和磁盘空间后重试，完整文件会复用，`model.bin` 大小不符时不会加载。
 - **提示助手版本过旧或不支持所选模型**：重新运行 `install-helper.ps1`，再到扩展管理页点击“重新加载”；扩展不会静默改用其他模型。
 - **公开音频下载失败**：Bilibili 或 `yt-dlp` 解析可能发生变化；更新项目版本后重试。登录或付费内容不会使用 Cookie 绕过限制。
 - **CPU 转写较慢**：这是免费的本机计算；可保持助手后台运行，之后回到同一个 BV 页面恢复。

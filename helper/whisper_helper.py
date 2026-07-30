@@ -29,7 +29,7 @@ os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 
 
-APP_VERSION = "1.3.0"
+APP_VERSION = "1.3.1"
 DEFAULT_MODEL = "small"
 SUPPORTED_MODELS = ("tiny", "base", "small")
 MODEL_FILES = ("config.json", "model.bin", "tokenizer.json", "vocabulary.txt")
@@ -606,7 +606,7 @@ class HelperState:
 
 
 class ApiHandler(BaseHTTPRequestHandler):
-    server_version = "BiliWhisper/1.3"
+    server_version = "BiliWhisper/1.3.1"
 
     def log_message(self, message, *args):
         self.server.state.logger.info("%s - %s", self.client_address[0], message % args)
@@ -737,7 +737,14 @@ def load_config(path: Path) -> dict:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=default_root() / "config.json")
-    parser.add_argument("--prepare-model", action="store_true")
+    parser.add_argument(
+        "--prepare-model",
+        action="append",
+        nargs="?",
+        const=DEFAULT_MODEL,
+        choices=SUPPORTED_MODELS,
+        metavar="MODEL",
+    )
     parser.add_argument("--serve", action="store_true")
     arguments = parser.parse_args(argv)
     config = load_config(arguments.config)
@@ -745,8 +752,9 @@ def main(argv=None) -> int:
     configure_logging(root)
     transcriber = LocalTranscriber(root, logging.getLogger("bili-whisper"))
     if arguments.prepare_model:
-        transcriber.load_model(DEFAULT_MODEL)
-        print(f"Whisper {DEFAULT_MODEL} ready ({transcriber.device}/{transcriber.compute_type})")
+        for model_name in dict.fromkeys(arguments.prepare_model):
+            transcriber.load_model(model_name)
+            print(f"Whisper {model_name} ready ({transcriber.device}/{transcriber.compute_type})")
         return 0
     if not arguments.serve:
         parser.error("请使用 --serve 或 --prepare-model")
